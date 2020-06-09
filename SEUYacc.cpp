@@ -25,6 +25,9 @@ void generate_action_goto_map(const DFA& dfa, const unordered_set<string>& termi
 	const DFATransitionTable& LRState, const string start, const unordered_set<string>& Left, map<vector<string>, int>& Pro_num,
 	unordered_map<string, int>& Left_level, map<int, map<string, int>>& GOTO, map<int, map<string, pair<string, int>>>& action);
 
+void write_parser_code(map<int, map<string, int>>& GOTO, map<int, map<string, pair<string, int>>>& action,
+	const unordered_set<string>& terminal, const unordered_set<string>& noter, const ProducerVecStr pro);
+
 
 int main()
 {
@@ -80,6 +83,8 @@ int main()
 	cout << "Converting..." << endl;
 	merge_LR1_sets_into_LALR_sets(dfa, LRState);
 	generate_action_goto_map(dfa, terminal, noter, LRState, start, Left, Pro_num, Left_level, GOTO, action); // 用来生成移进规约表
+	write_parser_code(GOTO, action, terminal, noter, pro);
+
 
 	return 0;
 }

@@ -10,7 +10,7 @@ void set_start(string a, ProducerVecStr& pro, vector<string>& startobj)
 
 	start2.first = "start";
 	start2.second.push_back(a);    //右侧的集合
-	pro.push_back(start2);
+	pro.insert(pro.begin(), start2);
 
 	string temp2 = "start";  //产生用于第一次内扩展的产生式
 	startobj.push_back(temp2);
@@ -299,6 +299,7 @@ void merge_LR1_sets_into_LALR_sets(DFA& dfa, DFATransitionTable& LRState) {
 	DFATransitionTable newLRState;
 
 	map<StateCore, set<int>> core2StatesNum;
+	vector<StateCore> ordered;
 
 	for (int i = 0; i < dfa.size(); i++) {
 		auto state = dfa[i];
@@ -306,6 +307,7 @@ void merge_LR1_sets_into_LALR_sets(DFA& dfa, DFATransitionTable& LRState) {
 		if (core2StatesNum.find(core) == core2StatesNum.end()) { // 新建
 			set<int> newSet = { i };
 			core2StatesNum[core] = newSet;
+			ordered.push_back(core);
 		}
 		else {
 			core2StatesNum[core].insert(i);
@@ -318,9 +320,9 @@ void merge_LR1_sets_into_LALR_sets(DFA& dfa, DFATransitionTable& LRState) {
 	int newIdx = 0;
 
 	// 合并，但暂不处理转换表，先记录新旧状态的映射关系
-	for (auto c : core2StatesNum) {
+	for (auto c : ordered) {
 		DFAState newState;
-		set<int> sns = c.second;
+		set<int> sns = core2StatesNum[c];
 		newDFA2OldDFA[newIdx] = sns;
 		for (auto i : sns) {
 			oldDFA2NewDFA[i] = newIdx;

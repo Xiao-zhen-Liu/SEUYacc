@@ -57,7 +57,7 @@ void generate_action_goto_map(const DFA& dfa, const unordered_set<string>& termi
 			auto j = j1.first;
 			if (j.first.size() == j.second)
 			{
-				if (j.first[0] == start)//如果是文法开始符号，说明分析完成
+				if (j.first[0] == "start")// 如果是文法开始符号，说明分析完成? 错误，应该是增广开始符号！否则无法输出开始产生式！
 				{
 					if (action[i]["#"].first != "n")
 					{

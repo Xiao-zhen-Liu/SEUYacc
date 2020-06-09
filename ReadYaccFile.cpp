@@ -101,7 +101,7 @@ int read_yacc_file(const string& fileName, string& start, unordered_set<string>&
 	terminal.insert("#");//给终结符添加#
 
 
-	cout << "标记end" << endl;
+	//cout << "标记end" << endl;
 	return 1;
 
 }

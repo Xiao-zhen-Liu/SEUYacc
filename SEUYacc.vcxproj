@@ -157,6 +157,7 @@
     </ClCompile>
     <ClCompile Include="ReadYaccFile.cpp" />
     <ClCompile Include="SEUYacc.cpp" />
+    <ClCompile Include="WriteParserCode.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common.h" />
