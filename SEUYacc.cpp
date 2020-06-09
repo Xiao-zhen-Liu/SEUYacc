@@ -6,11 +6,14 @@
 
 using namespace std;
 
-int read_yacc_file(const string& fileName, string& start, unordered_set<string>& terminal, ProducerVecStr& pro, vector<string>& funcVec);
+
+int read_yacc_file(const string& fileName, string& start, unordered_set<string>& terminal, ProducerVecStr& pro, vector<string>& funcVec, unordered_set<string> & Left, unordered_map<string, int> & Left_level);
 
 void set_start(string a, ProducerVecStr& pro, vector<string>& startobj);
 
 void get_no_terminal(ProducerVecStr& pro, unordered_set<string>& noter);
+
+void get_terminal(ProducerVecStr& pro, unordered_set<string>& noter, unordered_set<string>& terminal);
 
 void get_first_functions(ProducerVecStr& pro, unordered_set<string>& noter, map<string, unordered_set<string>>& First, unordered_set<string>& terminal);
 
@@ -72,10 +75,12 @@ int main()
 
 	// 开始符
 	string start;
-
-	read_yacc_file("yacc.y", start, terminal, pro, funcVec);
+	read_yacc_file("Yacc.y", start, terminal, pro, funcVec, Left, Left_level);
+	//read_yacc_file("完整minic.y", start, terminal, pro, funcVec, Left ,Left_level);
 	set_start(start, pro, startobj);
 	get_no_terminal(pro, noter); // 用来获得非终结符的集合，即产生式左边的字符的集合
+	get_terminal(pro, noter, terminal);//不是非终结符的字符都是终结符
+
 	build_pro_num(Pro_num, pro); // 为了读入的产生式一个编号(读入顺序
 	get_first_functions(pro, noter, First, terminal); // 生成first集
 	cout << "Getting LR1..." << endl;

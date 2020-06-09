@@ -4,7 +4,9 @@
 using namespace std;
 
 // 用来读入.y文件
-int read_yacc_file(const string& fileName, string& start, unordered_set<string>& terminal, ProducerVecStr& pro, vector<string>& funcVec) {
+int read_yacc_file(const string& fileName, string& start, unordered_set<string>& terminal, ProducerVecStr& pro, vector<string>& funcVec, unordered_set<string> & Left ,unordered_map<string, int> & Left_level) {
+
+	int ambiguity = 0;//用来判断yacc格式类型 0为
 	int lines = 0;  //标识正读到的行数
 	int opLevel = 0; //标识操作符优先级
 
@@ -36,27 +38,144 @@ int read_yacc_file(const string& fileName, string& start, unordered_set<string>&
 		//cout << str << endl;
 		terminal.insert(str);
 		in >> str;
-	} while (str != "%left" && str != "%type" && str != "%%" && str != "%start");  // 读入token结束
+	} while (str != "%left"&&str != "%type"&&str != "%%"&&str != "%start");  //读入 token结束
 
-	if (str == "%start") {
-		in >> str;
-		start = str;
-	}
+
 
 	do
 	{
+
+		if (str == "%start")
+		{
+			cout << "---------------------------------------------------------------" << endl;
+			ambiguity = 2; //如果有%start则自动生成，没有的话则把产生式第一个当做start
+			break;
+		}
+
 		in >> str;
+		if (str == "%left")
+		{
+			ambiguity = 1; //有%left说明本文法是二义性文法，需要读入符号优先级
+			cout << "bi" << endl;
+			break;
+		}
 
-	} while (str != "%left" && str != "%%");           // 清除中间的无用文本
 
+
+		if (str == "%%")
+		{
+			ambiguity = 0; //没有%left说明本文法不是二义性文法，不需要读入符号优先级
+			break;
+		}
+	} while (1);           //清除中间的无用文本
+
+
+
+	if (ambiguity == 1)
+	{
+
+		cout << "fa1" << endl;
+		cout << str << endl;
+
+		do
+		{
+			//cout << str<<endl;
+			if (str == "%left")
+			{
+				in >> str;
+				opLevel++;
+			}
+
+			if (str == "/*")
+			{
+				in >> str;
+				while (str != "*/")
+					in >> str;
+				if (str != "*/")
+				{
+					in >> str;
+				}
+
+				if (str == "%left")
+				{
+					in >> str;
+					opLevel++;
+				}
+			}
+
+			if (str != "*/")
+			{
+				Left.insert(str);
+				Left_level.insert(make_pair(str, opLevel));
+
+			}
+
+			in >> str;
+
+		} while (str != "%start"&&str != "%%");
+
+	}
+
+
+	if (ambiguity == 2)
+	{
+
+		cout << "第二种" << endl;
+		cout << str << endl;
+
+		do
+		{
+			//cout << str<<endl;
+			if (str == "%start")
+			{
+				in >> str;
+			}
+
+			if (str == "/*")
+			{
+				in >> str;
+				while (str != "*/")
+					in >> str;
+				if (str != "*/")
+				{
+					in >> str;
+				}
+
+				if (str == "%left")
+				{
+					in >> str;
+					opLevel++;
+				}
+			}
+
+			if (str != "*/")
+			{
+				start = str;
+			}
+
+			in >> str;
+
+		} while (str != "%%");
+
+	}
+
+
+	bool flat_start = true;
 
 	//开始读入产生式
 	in >> str;
 	int counter = 0;
 	do {
-		/*cout << str << endl;*/
-		pair<string, vector<string>> p;
+		cout << "fa" << endl;
+		cout << str << endl;
+		pair<string, vector<string> > p;
 
+		if (ambiguity == 1 && flat_start) {
+			start = str; //没有start的，第一个当产生式
+			flat_start = false;
+
+			//	cout << "start:" << start << endl;
+		}
 		p.first = str;  //左边
 		in >> str;   //全是:
 
@@ -76,9 +195,9 @@ int read_yacc_file(const string& fileName, string& start, unordered_set<string>&
 				in >> str;
 			}
 
-			while (str != "|" && str != ";")
+			while (str != "|"&&str != ";")
 			{
-				/*cout << str << endl;*/
+				cout << str << endl;
 				p.second.push_back(str);    //右侧的集合
 				in >> str;  //空格后的东西
 
@@ -91,7 +210,7 @@ int read_yacc_file(const string& fileName, string& start, unordered_set<string>&
 
 	//读入函数部分
 	do {
-		/*cout << str << endl;*/
+		cout << str << endl;
 		getline(in, str);
 
 		funcVec.push_back(str);
@@ -101,7 +220,7 @@ int read_yacc_file(const string& fileName, string& start, unordered_set<string>&
 	terminal.insert("#");//给终结符添加#
 
 
-	//cout << "标记end" << endl;
+	cout << "标记end" << endl;
 	return 1;
 
 }

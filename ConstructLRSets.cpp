@@ -28,6 +28,22 @@ void get_no_terminal(ProducerVecStr& pro, unordered_set<string>& noter)
 	}
 }
 
+
+//不是非终结符的字符都是终结符
+void get_terminal(ProducerVecStr& pro, unordered_set<string>& noter, unordered_set<string>& terminal)
+{
+
+	for (int i = 0; i < pro.size(); i++)
+	{
+
+		for (int j = 0; j < pro[i].second.size(); j++)
+			if (noter.find(pro[i].second[j]) != noter.end())
+				terminal.insert(pro[i].second[j]);
+	}
+}
+
+
+
 // 将temp_first存入产生式为s字符串的first，之后想查s的first去temp_first中找
 void build_temp_first(unordered_set<string>& temp_first, map<string, unordered_set<string>>& First, vector<string> s)
 {
@@ -246,6 +262,29 @@ void construct_LR1_sets(const vector<string> &startobj, const unordered_set<stri
 {
 	//vector<string> temp3;
 	//temp3.push_back("#");
+
+	set<LRitem> statu = inter_extend(make_pair(make_pair(startobj, 1), "#"), noter, pro, First, terminal); //初始项目的闭包，作为一个项目集合
+	set<string> after_set;
+	dfa.push_back(statu);  // 存入DFA中，得到一个编号为0，因为位置为0号
+
+	for (int i = 0; i < dfa.size(); i++)  //遍历每一个，直到DFA不再增大为止  push back 会自动放在数组最后一个
+	{
+
+		after_set.clear();
+		for (auto state1 : dfa[i])    //x是一个OBJ  first是产生式  second是·的位置
+		{
+			auto LRitem1 = state1.first;
+			if (LRitem1.first.size() == LRitem1.second) continue;
+			//如果已经到了最后一个位置了，说明是规约项目，不用后移
+			after_set.insert(LRitem1.first[LRitem1.second]);
+		}
+
+		for (auto t : after_set) outer_extend(i, t,dfa, LRState, noter, pro, First, terminal);
+		cout << dfa.size() << endl;
+	}
+
+
+	/*
 	DFAState statu = inter_extend(make_pair(make_pair(startobj, 1), "#"), noter, pro, First, terminal); //初始项目的闭包，作为一个项目集合
 	dfa.push_back(statu);  // 存入DFA中，得到一个编号为0，因为位置为0号
 
@@ -254,7 +293,10 @@ void construct_LR1_sets(const vector<string> &startobj, const unordered_set<stri
 		for (auto t : terminal) outer_extend(i, t, dfa, LRState, noter, pro, First, terminal);
 		for (auto n : noter) outer_extend(i, n, dfa, LRState, noter, pro, First, terminal);   //试探所有的符号
 		cout << dfa.size() << endl;
-	}
+	}*/
+
+
+	
 
 	//下面为打印集簇部分
 	//for (int i = 0; i < dfa.size(); i++)
