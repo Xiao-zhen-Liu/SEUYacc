@@ -32,8 +32,19 @@ void write_parser_code(map<int, map<string, int>>& GOTO, map<int, map<string, pa
 	const unordered_set<string>& terminal, const unordered_set<string>& noter, const ProducerVecStr pro, const string& definition, const string& code);
 
 
-int main()
+int main(int argc, char const* argv[])
 {
+	string file_name;
+
+	if (argc != 2) {
+		cout << "ERROR: invalid arguments number!\n";
+		return -1;
+	}
+	else
+	{
+		file_name = string(argv[1]);
+	}
+
 	// 存放终结符
 	unordered_set<string> terminal;
 	
@@ -73,7 +84,7 @@ int main()
 	// 开始符
 	string start, definition, code;
 
-	read_yacc_file("yacc.y", start, terminal, pro, definition, code, Left, Left_level);
+	read_yacc_file(file_name, start, terminal, pro, definition, code, Left, Left_level);
 	set_start(start, pro, startobj);
 	get_no_terminal(pro, noter); // 用来获得非终结符的集合，即产生式左边的字符的集合
 	get_terminal(pro, noter, terminal);//不是非终结符的字符都是终结符

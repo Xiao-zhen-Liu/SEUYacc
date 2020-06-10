@@ -5,6 +5,8 @@ using namespace std;
 
 // 用来读入.y文件
 int read_yacc_file(const string& fileName, string& start, unordered_set<string>& terminal, ProducerVecStr& pro,  string& definition, string& code, unordered_set<string>& Left, unordered_map<string, int>& Left_level) {
+	
+	int ambiguity = 0;//用来判断yacc格式类型 0为
 	int lines = 0;  //标识正读到的行数
 	int opLevel = 0; //标识操作符优先级
 
