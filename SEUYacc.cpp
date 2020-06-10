@@ -6,7 +6,7 @@
 
 using namespace std;
 
-int read_yacc_file(const string& fileName, string& start, unordered_set<string>& terminal, ProducerVecStr& pro, vector<string>& funcVec);
+int read_yacc_file(const string& fileName, string& start, unordered_set<string>& terminal, ProducerVecStr& pro, string& definition, string& code);
 
 void set_start(string a, ProducerVecStr& pro, vector<string>& startobj);
 
@@ -26,7 +26,7 @@ void generate_action_goto_map(const DFA& dfa, const unordered_set<string>& termi
 	unordered_map<string, int>& Left_level, map<int, map<string, int>>& GOTO, map<int, map<string, pair<string, int>>>& action);
 
 void write_parser_code(map<int, map<string, int>>& GOTO, map<int, map<string, pair<string, int>>>& action,
-	const unordered_set<string>& terminal, const unordered_set<string>& noter, const ProducerVecStr pro);
+	const unordered_set<string>& terminal, const unordered_set<string>& noter, const ProducerVecStr pro, const string& definition, const string& code);
 
 
 int main()
@@ -36,9 +36,6 @@ int main()
 	
 	// 存放非终结符
 	unordered_set<string> noter;
-	
-	// 函数部分
-	vector<string> funcVec;
 	
 	// 所有的产生式
 	ProducerVecStr pro;
@@ -73,7 +70,9 @@ int main()
 	// 开始符
 	string start;
 
-	read_yacc_file("yacc.y", start, terminal, pro, funcVec);
+	string definition, code;
+
+	read_yacc_file("yacc.y", start, terminal, pro, definition, code);
 	set_start(start, pro, startobj);
 	get_no_terminal(pro, noter); // 用来获得非终结符的集合，即产生式左边的字符的集合
 	build_pro_num(Pro_num, pro); // 为了读入的产生式一个编号(读入顺序
@@ -83,7 +82,7 @@ int main()
 	cout << "Converting..." << endl;
 	merge_LR1_sets_into_LALR_sets(dfa, LRState);
 	generate_action_goto_map(dfa, terminal, noter, LRState, start, Left, Pro_num, Left_level, GOTO, action); // 用来生成移进规约表
-	write_parser_code(GOTO, action, terminal, noter, pro);
+	write_parser_code(GOTO, action, terminal, noter, pro, definition, code);
 
 
 	return 0;

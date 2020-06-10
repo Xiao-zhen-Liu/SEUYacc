@@ -4,7 +4,7 @@
 using namespace std;
 
 // 用来读入.y文件
-int read_yacc_file(const string& fileName, string& start, unordered_set<string>& terminal, ProducerVecStr& pro, vector<string>& funcVec) {
+int read_yacc_file(const string& fileName, string& start, unordered_set<string>& terminal, ProducerVecStr& pro, string& definition, string& code) {
 	int lines = 0;  //标识正读到的行数
 	int opLevel = 0; //标识操作符优先级
 
@@ -18,6 +18,20 @@ int read_yacc_file(const string& fileName, string& start, unordered_set<string>&
 	}
 	string str;
 	int i = 0;//表示statement中第几行
+
+	getline(in, str);
+	if (str == "%{") {
+		getline(in, str);
+		while (str != "%}" && !in.eof())
+		{
+			definition += str + "\n";
+			getline(in, str);
+		}
+		if (in.eof()) {
+			cout << "ERROR: incomplete code definition area." << endl;
+			return 0;
+		}
+	}
 
 	do
 	{
@@ -88,18 +102,13 @@ int read_yacc_file(const string& fileName, string& start, unordered_set<string>&
 		in >> str;  //每段：左边的单词
 
 	} while (str != "%%");
-
 	//读入函数部分
 	do {
-		/*cout << str << endl;*/
 		getline(in, str);
-
-		funcVec.push_back(str);
-
+		code += str + "\n";
 	} while (!in.eof());
 
 	terminal.insert("#");//给终结符添加#
-
 
 	//cout << "标记end" << endl;
 	return 1;
