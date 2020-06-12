@@ -21,7 +21,7 @@ int find_dot(int& pos, const DFA& dfa, const unordered_set<int>& Left_num)
 
 // 用来生成移进规约表
 void generate_action_goto_map(const DFA& dfa, const unordered_set<string>& terminal, const unordered_set<string>& noter, 
-	const DFATransitionTable& LRState, const string & start, const unordered_set<string>& Left, map<vector<int>, int>& Pro_num,
+	const DFATransitionTable& LRState, const string & start, const unordered_set<string>& Left, map<vector<int>, int>& r_num,
 	unordered_map<string, int>& Left_level, map<int, map<string, int>>& GOTO, map<int, map<string, pair<string, int>>>& action, 
 	const unordered_set<int>& terminal_num,unordered_map<int, string> &ns_map, unordered_map<string, int>& sn_map, const unordered_set<int>& Left_num)
 {
@@ -79,7 +79,7 @@ void generate_action_goto_map(const DFA& dfa, const unordered_set<string>& termi
 					cout << "have an error\n"; */
 				}
 				else
-					action[i][ns_map[a]] = make_pair("r", Pro_num[j.first]);//规约项目，
+					action[i][ns_map[a]] = make_pair("r", r_num[j.first]);//规约项目，
 					//用的产生式编号通过rInput找
 
 				/*

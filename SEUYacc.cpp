@@ -71,7 +71,6 @@ int main(int argc, char const* argv[])
 	map<int, unordered_set<int>> First;
 
 	// 通过产生式得到编号，与input相反
-	map<vector<int>, int> Pro_num;
 	
 	// DFA转换表, pair<项目编号, 终结符/非终结符>, 移进项目编号, i状态识别一个x后到达j状态.
 	DFATransitionTable LRState; 
@@ -119,7 +118,7 @@ int main(int argc, char const* argv[])
 	construct_LR1_sets(startobj, terminal, noter, pro, First, dfa, LRState,  sn_map, divide, wp_map,  pro_num ,ns_map); // 用来生成状态之间的转换关系
 	cout << "Converting..." << endl;
 	merge_LR1_sets_into_LALR_sets(dfa, LRState);
-	generate_action_goto_map(dfa, terminal, noter, LRState, start, Left, Pro_num, Left_level, GOTO, action,
+	generate_action_goto_map(dfa, terminal, noter, LRState, start, Left, r_num, Left_level, GOTO, action,
 		 terminal_num,  ns_map, sn_map,  Left_num); // 用来生成移进规约表
 	write_parser_code(GOTO, action, terminal, noter, pro, definition, code);
 
