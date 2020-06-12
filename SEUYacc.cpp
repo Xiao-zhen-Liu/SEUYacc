@@ -104,23 +104,12 @@ int main(int argc, char const* argv[])
 
 	read_yacc_file(file_name, start, terminal, pro, definition, code, Left, Left_level);
 	set_start(start, pro, startobj);
-	cout <<"我是开始"<< start << endl;
-
 
 	get_no_terminal(pro, noter); // 用来获得非终结符的集合，即产生式左边的字符的集合
 	get_terminal(pro, noter, terminal);//不是非终结符的字符都是终结符
 	build_pro_num( terminal, sn_map,  ns_map,  terminal_num, divide,noter,  Left,  noter_num,  Left_num, pro, pro_num,r_num,wp_map); // 为了读入的产生式一个编号(读入顺序
 
-
 	add_start(start,  startobj, sn_map);
-
-		for (int k = 0; k < startobj.size(); k++)
-		{
-			cout << "我也是开始";
-			cout << startobj[k] << " ";
-			cout << ns_map[startobj[k]] << " ";
-		}
-
 
 
 	get_first_functions( pro_num, noter_num,  First, terminal_num,  sn_map); // 生成first集
