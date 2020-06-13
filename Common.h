@@ -25,7 +25,7 @@ typedef std::map<std::pair<int, int>, int> DFATransitionTable;
 
 
 // 用来定义空串，可根据不同的.y文件调整
-const std::string kong = "eplsion";
+const std::string kong = "epsilon";
 
 
 
