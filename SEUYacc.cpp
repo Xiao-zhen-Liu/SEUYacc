@@ -18,7 +18,7 @@ void get_no_terminal(ProducerVecStr& pro, unordered_set<string>& noter);
 void get_terminal(ProducerVecStr& pro, unordered_set<string>& noter, unordered_set<string>& terminal);
 
 void get_first_functions(ProducerVec& pro_num, unordered_set<int>& noter_num, map<int, unordered_set<int>>& First,
-	unordered_set<int>& terminal_num, unordered_map<string, int>& sn_map);
+	unordered_set<int>& terminal_num, unordered_map<string, int>&  sn_map, unordered_map<int, string>& ns_map);
 
 void build_pro_num(unordered_set<string>& terminal, unordered_map<string, int>&  sn_map, unordered_map<int, string> & ns_map, unordered_set<int> & terminal_num, int & divide,
 	unordered_set<string> &  noter, unordered_set<string>&  Left, unordered_set<int> & noter_num, unordered_set<int>&  Left_num, ProducerVecStr & pro, ProducerVec & pro_num,
@@ -112,7 +112,25 @@ int main(int argc, char const* argv[])
 	add_start(start,  startobj, sn_map);
 
 
-	get_first_functions( pro_num, noter_num,  First, terminal_num,  sn_map); // 生成first集
+	get_first_functions( pro_num, noter_num,  First, terminal_num,  sn_map, ns_map); // 生成first集
+
+	/*
+	cout << "一次" << endl;
+	for (auto i : First)
+	{
+		int ch = i.first;
+		if (noter_num.find(ch) != noter_num.end())
+		{
+			cout << "左边为" << ns_map[ch] << "->";
+
+			for (auto j : First[ch])
+			{
+				cout << ns_map[j] << " ";
+			}
+			cout << endl;
+		}
+	}*/
+
 	cout << "Getting LR1..." << endl;
 
 

@@ -3,6 +3,8 @@
 
 using namespace std;
 
+
+
 // 定义开始符，可根据不同的.y文件调整
 void set_start(string& a, ProducerVecStr& pro, vector<int>& startobj)
 {
@@ -16,11 +18,25 @@ void set_start(string& a, ProducerVecStr& pro, vector<int>& startobj)
 
 void add_start(string& a, vector<int>& startobj, unordered_map<string, int> &sn_map)
 {
+	
 
 	string temp2 = "start";  //产生用于第一次内扩展的产生式
 	startobj.push_back(sn_map[temp2]);
 	temp2 = a;
 	startobj.push_back(sn_map[temp2]);
+
+	
+
+	/*
+	string temp2 = "translation_unit";  //产生用于第一次内扩展的产生式
+	startobj.push_back(sn_map[temp2]);
+	temp2 = "translation_unit";
+	startobj.push_back(sn_map[temp2]);
+
+	temp2 = "external_declaration";
+	startobj.push_back(sn_map[temp2]);
+
+	*/
 
 }
 
@@ -161,12 +177,12 @@ void build_temp_first(unordered_set<int>& temp_first, map<int, unordered_set<int
 
 // 生成first集
 void get_first_functions(ProducerVec& pro_num, unordered_set<int>& noter_num, map<int, unordered_set<int>>& First, 
-	unordered_set<int>& terminal_num, unordered_map<string, int>&  sn_map)
+	unordered_set<int>& terminal_num, unordered_map<string, int>&  sn_map,unordered_map<int, string>& ns_map)
 {
-	bool flag = 1;//是否改变
-	while (flag)
+	bool change = 1;//是否改变
+	while (change)
 	{
-		flag = 0;
+		change = 0;
 		for (auto no : noter_num)
 		{
 			for (int i = 0; i < pro_num.size(); i++)
@@ -179,7 +195,7 @@ void get_first_functions(ProducerVec& pro_num, unordered_set<int>& noter_num, ma
 					{
 						if (noter_num.find(ch) == noter_num.end()) // A terminal
 						{
-							if (First[no].insert(ch).second) flag = 1; // An insertion is made
+							if (First[no].insert(ch).second) change = 1; // An insertion is made
 							flag = 0; // ?
 						}
 						else // Is a nonterminal
@@ -188,7 +204,7 @@ void get_first_functions(ProducerVec& pro_num, unordered_set<int>& noter_num, ma
 							{
 								if (k != sn_map[kong])
 								{
-									if (First[no].insert(k).second) flag = 1;
+									if (First[no].insert(k).second) change = 1;
 									flag = 0;
 								}
 								else flag = 1;
@@ -198,7 +214,7 @@ void get_first_functions(ProducerVec& pro_num, unordered_set<int>& noter_num, ma
 						if (flag == 0) break;
 
 					}
-					if (flag == 1 && First[no].insert(sn_map[kong]).second) flag = 1;
+					if (flag == 1 && First[no].insert(sn_map[kong]).second) change = 1;
 				}
 			}
 			for (auto i : terminal_num) First[i].insert(i);
@@ -206,23 +222,7 @@ void get_first_functions(ProducerVec& pro_num, unordered_set<int>& noter_num, ma
 
 	}
 
-	/*以下为打印测试部分
-	cout << "一次" << endl;
-		for (auto i : First)
-		{
-			string ch = i.first;
-			if (noter.find(ch) != noter.end())
-			{
-			cout << "左边为" << ch << "->";
-
-			for (auto j : First[ch])
-			{
-					cout << j << " ";
-			}
-			cout << endl;
-			}
-		}
-		*/
+		
 }
 
 //项目闭包的内部扩展
@@ -246,14 +246,11 @@ unordered_set<LRitem> inter_extend(unordered_set <LRitem> & x,int &divide,
 
 	while (!queue.empty())  // 直到集合不再增大为止
 	{
-
-		
 		lritem1 = queue.front();
 		item1 = queue.front().first;
 		if (item1.second >= item1.first.size())
 		{//点在末尾，处理下一个产生式
 			queue.pop();
-
 			continue;
 		}
 
@@ -261,80 +258,55 @@ unordered_set<LRitem> inter_extend(unordered_set <LRitem> & x,int &divide,
 
 			int s = item1.first[item1.second];    //得到了点后面的符号
 
-
-
-
-
 			if (s < divide)//是终结符，没有闭包，处理下一个
 			{
 				queue.pop();
-				//cout << "gan《  " << ns_map[s] << " ";
 				continue;
 			}
 
-
 			queue.pop();
-			//cout << "gan《  " << ns_map[s] << " ";
-
-
-
-
 
 			for (auto i : wp_map[s])    //找出这个非终结符的产生式
 			{
-			
 
 				vector<int> temp = pro_num[i].second;   //产生式右向
-
-
 				temp.insert(temp.begin(), s);
-
-
 				vector<int> xx;
 				//若项目[A->x·by,a]属于闭包ans,B->R是产生式
 				//对first（Ra) 中的每个字符串b，若[B->r，b]不在ans中，加入
 				xx.assign(item1.first.begin() + item1.second + 1, item1.first.end());
+				//xx.push_back(lritem1.second);
 
-
+				
 				build_temp_first(temp_first, First, xx, sn_map);
-			
-
+				
 				if (temp_first.find(sn_map[kong]) != temp_first.end()) {//有epsilon
 					temp_first.erase(sn_map[kong]);
 					temp_first.insert(lritem1.second);
 				}
+				
+				/*
+				cout <<"预测"<< endl;
+				for (auto LRitem2 : temp_first)   //j为一个item
+				{
+						cout << ns_map[LRitem2] << " ";
+				}
+				cout << endl;
+				*/
 
 				LRitem TEMP;
 
-
-
 				for (auto b : temp_first)//getfirst 计算得到的结果在se中  
 				{
-
 					TEMP.second = b;
 					TEMP.first.first = temp;
 					TEMP.first.second = 1;
-
-
-
 					auto findIt = extended.find(TEMP);
 					if (findIt != extended.end()) //存在一样的了， 就不再处理
 						continue;
-
-				
-
 					queue.push(TEMP);
 					extended.insert(TEMP);
 				}
-				//cout << "一次结束" << endl;
-
-				/*
-					if (queue.push(make_pair(make_pair(temp, 1), b)).second)  //如果插入成功
-					{
-						f = 1;   //如果插入成功，f=1，集合增大了
-					}
-				*/
-				// temp.insert(temp.begin(), s);
 			}
 
 
@@ -372,7 +344,6 @@ unordered_set<LRitem> inter_extend(unordered_set <LRitem> & x,int &divide,
 	}
 
 	*/
-
 	return extended;
 
 }
@@ -432,6 +403,7 @@ void construct_LR1_sets(const vector<int> &startobj, const unordered_set<string>
 	int& divide, map<int, vector<int>> &wp_map, ProducerVec &pro_num ,unordered_map<int, string>& ns_map)
 {
 
+
 	unordered_set<LRitem> statu;
 
 	statu.insert(make_pair(make_pair(startobj, 1), sn_map["#"]));
@@ -470,6 +442,7 @@ void construct_LR1_sets(const vector<int> &startobj, const unordered_set<string>
 
 	
 	//下面为打印集簇部分
+
 	/*
 	for (int i = 0; i < dfa.size(); i++)
 	{
@@ -488,8 +461,11 @@ void construct_LR1_sets(const vector<int> &startobj, const unordered_set<string>
 			cout << "," << ns_map[state1.second] << endl;
 		}
 		cout << endl;
-	}
 
+	}
+	*/
+
+	/*
 	//下面为打印移进部分     
 	for (auto i : LRState)
 	{
