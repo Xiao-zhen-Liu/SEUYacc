@@ -102,6 +102,7 @@ int main(int argc, char const* argv[])
 	int  divide;
 
 	read_yacc_file(file_name, start, terminal, pro, definition, code, Left, Left_level);
+	cout << "START:" << start << endl;
 	set_start(start, pro, startobj);
 
 	get_no_terminal(pro, noter); // 用来获得非终结符的集合，即产生式左边的字符的集合

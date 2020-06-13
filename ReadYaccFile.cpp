@@ -180,8 +180,8 @@ int read_yacc_file(const string& fileName, string& start, unordered_set<string>&
 	in >> str;
 	int counter = 0;
 	do {
-		cout << "fa" << endl;
-		cout << str << endl;
+		//cout << "fa" << endl;
+		//cout << str << endl;
 		pair<string, vector<string> > p;
 
 		if (ambiguity == 1 && flat_start) {
@@ -230,6 +230,16 @@ int read_yacc_file(const string& fileName, string& start, unordered_set<string>&
 	terminal.insert("#");//给终结符添加#
 
 	//cout << "标记end" << endl;
+
+	for (size_t i = 0; i < pro.size(); i++)
+	{
+		for (size_t j = 0; j < pro[i].second.size(); j++) {
+			if (pro[i].second[j][0] == '\'') {
+				pro[i].second[j] = pro[i].second[j][1];
+			}
+		}
+	}
+
 	return 1;
 
 }

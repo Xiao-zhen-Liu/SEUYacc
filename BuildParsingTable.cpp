@@ -94,28 +94,28 @@ void generate_action_goto_map(const DFA& dfa, const unordered_set<string>& termi
 
 	}
 
-	cout << " ";
-	for (auto i : terminal) cout << i << " ";
-	cout << endl;
-	for (int i = 0; i < dfa.size(); i++)
-	{
-		cout << i << " ";
-		for (auto j : terminal)
-		{
-			cout << action[i][j].first << action[i][j].second << "  ";
-		}
-		cout << endl;
-	}
-	cout << " ";
-	for (auto i : noter) cout << i << " ";
-	cout << endl;
-	for (int i = 0; i < dfa.size(); i++)
-	{
-		cout << i << " ";
-		for (auto j : noter)
-		{
-			cout << GOTO[i][j] << " ";
-		}
-		cout << endl;
-	}
+	//cout << " ";
+	//for (auto i : terminal) cout << i << " ";
+	//cout << endl;
+	//for (int i = 0; i < dfa.size(); i++)
+	//{
+	//	cout << i << " ";
+	//	for (auto j : terminal)
+	//	{
+	//		cout << action[i][j].first << action[i][j].second << "  ";
+	//	}
+	//	cout << endl;
+	//}
+	//cout << " ";
+	//for (auto i : noter) cout << i << " ";
+	//cout << endl;
+	//for (int i = 0; i < dfa.size(); i++)
+	//{
+	//	cout << i << " ";
+	//	for (auto j : noter)
+	//	{
+	//		cout << GOTO[i][j] << " ";
+	//	}
+	//	cout << endl;
+	//}
 }
