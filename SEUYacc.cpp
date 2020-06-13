@@ -6,6 +6,56 @@
 
 using namespace std;
 
+// 存放终结符
+unordered_set<string> terminal;
+
+// 存放非终结符
+unordered_set<string> noter;
+
+// 所有的产生式
+ProducerVecStr pro;
+
+// 存放运算符号
+unordered_set<string> Left;
+
+// 存放优先级
+unordered_map<string, int> Left_level;
+
+// first集合，follow集合
+map<int, unordered_set<int>> First;
+
+// 通过产生式得到编号，与input相反
+
+// DFA转换表, pair<项目编号, 终结符/非终结符>, 移进项目编号, i状态识别一个x后到达j状态.
+DFATransitionTable LRState;
+
+// 项目集 规范族
+DFA dfa;
+
+// action表, action[项目集编号][终结符]<pair 移进/规约，项目集/产生式编号>
+map<int, map<string, pair<string, int>>> action;
+
+// GOTO表，goto[项目集编号][非终结符]=项目集编号
+map<int, map<string, int>> GOTO;
+
+// 存放开始产生式
+vector<int> startobj;
+
+// 开始符
+string start, definition, code;
+
+//以下为提供数字映射所增加的结构
+unordered_map<string, int> sn_map;
+unordered_map<int, string> ns_map;
+unordered_set<int> terminal_num;
+unordered_set<int> noter_num;
+unordered_set<int> Left_num;
+ProducerVec pro_num;
+map < vector<int>, int > r_num;
+map<int, vector<int>> wp_map;
+
+int  divide;
+
 
 int read_yacc_file(const string& fileName, string& start, unordered_set<string>& terminal, ProducerVecStr& pro, string& definition, string& code, unordered_set<string>& Left, unordered_map<string, int>& Left_level);
 
@@ -17,16 +67,10 @@ void get_no_terminal(ProducerVecStr& pro, unordered_set<string>& noter);
 
 void get_terminal(ProducerVecStr& pro, unordered_set<string>& noter, unordered_set<string>& terminal);
 
-void get_first_functions(ProducerVec& pro_num, unordered_set<int>& noter_num, map<int, unordered_set<int>>& First,
-	unordered_set<int>& terminal_num, unordered_map<string, int>&  sn_map, unordered_map<int, string>& ns_map);
-
 void build_pro_num(unordered_set<string>& terminal, unordered_map<string, int>&  sn_map, unordered_map<int, string> & ns_map, unordered_set<int> & terminal_num, int & divide,
 	unordered_set<string> &  noter, unordered_set<string>&  Left, unordered_set<int> & noter_num, unordered_set<int>&  Left_num, ProducerVecStr & pro, ProducerVec & pro_num,
 	map<vector<int>, int>&  r_num, map<int, vector<int>> & wp_map);
 
-void construct_LR1_sets(const vector<int> &startobj, const unordered_set<string>& terminal, const unordered_set<string>& noter,
-	const ProducerVecStr& pro, map<int, unordered_set<int>>& First, DFA& dfa, DFATransitionTable& LRState, unordered_map<string, int>& sn_map,
-	int& divide, map<int, vector<int>>& wp_map, ProducerVec & pro_num, unordered_map<int, string> & ns_map);
 
 void merge_LR1_sets_into_LALR_sets(DFA& dfa, DFATransitionTable& LRState);
 
@@ -37,6 +81,10 @@ void generate_action_goto_map(const DFA& dfa, const unordered_set<string>& termi
 
 void write_parser_code(map<int, map<string, int>>& GOTO, map<int, map<string, pair<string, int>>>& action,
 	const unordered_set<string>& terminal, const unordered_set<string>& noter, const ProducerVecStr pro, const string& definition, const string& code);
+
+void construct_LR1_sets();   //用来生成集簇之间的转换关系
+
+void first_operation();
 
 
 int main(int argc, char const* argv[])
@@ -52,54 +100,7 @@ int main(int argc, char const* argv[])
 		file_name = string(argv[1]);
 	}
 
-	// 存放终结符
-	unordered_set<string> terminal;
 	
-	// 存放非终结符
-	unordered_set<string> noter;
-	
-	// 所有的产生式
-	ProducerVecStr pro;
-	
-	// 存放运算符号
-	unordered_set<string> Left;
-
-	// 存放优先级
-	unordered_map<string, int> Left_level;
-
-	// first集合，follow集合
-	map<int, unordered_set<int>> First;
-
-	// 通过产生式得到编号，与input相反
-	
-	// DFA转换表, pair<项目编号, 终结符/非终结符>, 移进项目编号, i状态识别一个x后到达j状态.
-	DFATransitionTable LRState; 
-
-	// 项目集 规范族
-	DFA dfa;
-
-	// action表, action[项目集编号][终结符]<pair 移进/规约，项目集/产生式编号>
-	map<int, map<string, pair<string, int>>> action;
-	
-	// GOTO表，goto[项目集编号][非终结符]=项目集编号
-	map<int, map<string, int>> GOTO;
-
-	// 存放开始产生式
-	vector<int> startobj;
-
-	// 开始符
-	string start, definition, code;
-
-	unordered_map<string, int> sn_map;
-	unordered_map<int, string> ns_map;
-	unordered_set<int> terminal_num;
-	unordered_set<int> noter_num;
-	unordered_set<int> Left_num;
-	ProducerVec pro_num;
-	map < vector<int>, int > r_num;
-	map<int, vector<int>> wp_map;
-
-	int  divide;
 
 	read_yacc_file(file_name, start, terminal, pro, definition, code, Left, Left_level);
 	cout << "START:" << start << endl;
@@ -111,30 +112,25 @@ int main(int argc, char const* argv[])
 
 	add_start(start,  startobj, sn_map);
 
+	first_operation();
 
-	get_first_functions( pro_num, noter_num,  First, terminal_num,  sn_map, ns_map); // 生成first集
-
-	/*
+	
 	cout << "一次" << endl;
 	for (auto i : First)
 	{
 		int ch = i.first;
-		if (noter_num.find(ch) != noter_num.end())
-		{
 			cout << "左边为" << ns_map[ch] << "->";
-
 			for (auto j : First[ch])
 			{
 				cout << ns_map[j] << " ";
 			}
 			cout << endl;
-		}
-	}*/
+	}
 
 	cout << "Getting LR1..." << endl;
 
 
-	construct_LR1_sets(startobj, terminal, noter, pro, First, dfa, LRState,  sn_map, divide, wp_map,  pro_num ,ns_map); // 用来生成状态之间的转换关系
+	construct_LR1_sets(); // 用来生成状态之间的转换关系
 	cout << "Converting..." << endl;
 	merge_LR1_sets_into_LALR_sets(dfa, LRState);
 	generate_action_goto_map(dfa, terminal, noter, LRState, start, Left, r_num, Left_level, GOTO, action,
