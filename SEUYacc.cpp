@@ -121,8 +121,8 @@ int main(int argc, char const* argv[])
 	//}
 
 	cout << "Getting LR1..."; construct_LR1_sets(); cout << "\tDONE." << endl;
-	/*cout << "Converting to LALR..." << endl;
-	merge_LR1_sets_into_LALR_sets(dfa, LRState);*/
+	cout << "Converting to LALR..." << endl;
+	merge_LR1_sets_into_LALR_sets(dfa, LRState);
 	cout << "Generating ACTION/GOTO map...";
 	generate_action_goto_map(dfa, terminal, noter, LRState, start, Left, r_num, Left_level, GOTO, action,
 		 terminal_num,  ns_map, sn_map,  Left_num); // 用来生成移进规约表

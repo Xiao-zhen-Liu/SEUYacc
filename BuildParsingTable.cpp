@@ -26,19 +26,19 @@ int find_dot(int& pos, const DFA& dfa, const unordered_set<int>& Left_num)
 
 int find_pro(int& pos, const DFA& dfa, int a)   //找到集簇中，预测符是a的，要规约的产生式中，最早出现的产生式序号
 {
-	int min = 9999;
+	int max = -1;
 	for (auto x1 : dfa[pos])    //x是一个OBJ  first是产生式  second是·的位置
 	{
 		auto x = x1.second;
 		auto x2 = x1.first;
 		if (x == a && x2.first.size() == x2.second)  //是需要规约的产生式，并且后面的预测符是边上的
 		{
-			if (r_num[x1.first.first] < min)
-				min = r_num[x1.first.first];
+			if (r_num[x1.first.first] > max)
+				max = r_num[x1.first.first];
 		}
 	}
 
-	return min;
+	return max;
 }
 
 
@@ -124,14 +124,11 @@ void generate_action_goto_map(const DFA& dfa, const unordered_set<string>& termi
 				int a = j1.second; //LR(1)分析，只有当接下来的词是
 
 
-				if (    // i表示行，为当前格子的状态。 a表示列，为移进的预测符
-					action[i][ns_map[a]].first != "n" && //格子中已有东西
-					(
-					(action[i][ns_map[a]].first[0] == 's'    &&   Left_level[ns_map[find_dot(i, dfa, Left_num)]] < Left_level[ns_map[a]]) || //不是移进规约冲突中优先级较大的
-						(action[i][ns_map[a]].first[0] == 'r'  &&   find_pro(i, dfa, a) < r_num[j.first])  //不是规约规约冲突中产生式序号较小的
-						)
-					)
-				{   //无动作
+				if (action[i][ns_map[a]].first != "n" && (((action[i][ns_map[a]].first == "s"))))
+				{ 
+					cout << "RR!" << endl;
+					cout << action[i][ns_map[a]].first << action[i][ns_map[a]].second << endl;
+					continue;
 					/*
 					if( Left_level[find_dot(i)] > Left_level[a])
 						action[i][a] = make_pair("r", rInput[j.first]);//规约项目，
@@ -140,44 +137,9 @@ void generate_action_goto_map(const DFA& dfa, const unordered_set<string>& termi
 				else
 					action[i][ns_map[a]] = make_pair("r", r_num[j.first]);//规约项目，
 					//用的产生式编号通过rInput找
-
-
-				/*
-				for(auto a:Follow[j.first[0]]) //SLR(1)是，需要往后看一个字符，将follow集合的置r
-				//for (auto a : terminal)//LR(9)分析在遇到规约项目时，不需要看下一个字符，直接进行规约
-					//所以在所有的终结符添上r。
-				{
-
-				}*/
 			}
 		}
 
 	}
 
-	// 以下代码仅用于输出
-
-	/*cout << " ";
-	for (auto i : terminal) cout << i << " ";
-	cout << endl;
-	for (int i = 0; i < dfa.size(); i++)
-	{
-		cout << i << " ";
-		for (auto j : terminal)
-		{
-			cout << action[i][j].first << action[i][j].second << "  ";
-		}
-		cout << endl;
-	}
-	cout << " ";
-	for (auto i : noter) cout << i << " ";
-	cout << endl;
-	for (int i = 0; i < dfa.size(); i++)
-	{
-		cout << i << " ";
-		for (auto j : noter)
-		{
-			cout << GOTO[i][j] << " ";
-		}
-		cout << endl;
-	}*/
 }
