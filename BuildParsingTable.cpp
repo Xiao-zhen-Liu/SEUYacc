@@ -22,7 +22,7 @@ int find_dot(int& pos, const DFA& dfa, const unordered_set<int>& Left_num)
 // 用来生成移进规约表
 
 void generate_action_goto_map(const DFA& dfa, const unordered_set<string>& terminal, const unordered_set<string>& noter, 
-	const DFATransitionTable& LRState, const string & start, const unordered_set<string>& Left, map<vector<int>, int>& r_num,
+	DFATransitionTable& LRState, const string & start, const unordered_set<string>& Left, map<vector<int>, int>& r_num,
 	unordered_map<string, int>& Left_level, map<int, map<string, int>>& GOTO, map<int, map<string, pair<string, int>>>& action, 
 	const unordered_set<int>& terminal_num,unordered_map<int, string> &ns_map, unordered_map<string, int>& sn_map, const unordered_set<int>& Left_num)
 {
@@ -31,6 +31,35 @@ void generate_action_goto_map(const DFA& dfa, const unordered_set<string>& termi
 		for (auto j : terminal) action[i][j] = make_pair("n", 0);    //i为项目号， j为字符号  结果为移进还是规约，目标号
 		for (auto j : noter)  GOTO[i][j] = -1;   //i项目号，j为字符号   -1为目标项目编号
 	}
+
+	//for (int i = 0; i < dfa.size(); i++) {
+	//	auto s = dfa[i];
+	//	for (auto lritm : s) {
+	//		// i 为一个LR项目
+	//		if (lritm.first.second == lritm.first.first.size()) {
+	//			cout << "REDUCE" << endl;
+	//			if (ns_map[lritm.first.first[0]] == "start" && ns_map[lritm.second] == "#") {
+	//				action[i][ns_map[lritm.second]] = make_pair("acc", 0);
+	//			}
+	//			else {
+	//				action[i][ns_map[lritm.second]] = make_pair("r", r_num[lritm.first.first]);
+	//				GOTO[i][ns_map[lritm.first.first[0]]] = LRState[{i, lritm.first.first[0]}];
+	//			}
+	//		}
+	//		else {
+	//			int a = lritm.first.first[lritm.first.second];
+	//			int b = lritm.second;
+	//			if (terminal_num.find(a) != terminal_num.end()) {
+	//				// terminal
+	//				if (LRState.find({ i, a }) != LRState.end()) {
+	//					int to = LRState[{i, a}];
+	//					action[i][ns_map[a]] = make_pair("s", to);
+	//				}
+	//			}
+	//		}
+	//	}
+	//}
+
 	for (auto i : LRState)  //i的first.first是起点项目编号，first.second是字符号，second是终点编号
 	{
 		if (terminal_num.find(i.first.second) != terminal_num.end())   //是终结符
@@ -95,28 +124,30 @@ void generate_action_goto_map(const DFA& dfa, const unordered_set<string>& termi
 
 	}
 
-	//cout << " ";
-	//for (auto i : terminal) cout << i << " ";
-	//cout << endl;
-	//for (int i = 0; i < dfa.size(); i++)
-	//{
-	//	cout << i << " ";
-	//	for (auto j : terminal)
-	//	{
-	//		cout << action[i][j].first << action[i][j].second << "  ";
-	//	}
-	//	cout << endl;
-	//}
-	//cout << " ";
-	//for (auto i : noter) cout << i << " ";
-	//cout << endl;
-	//for (int i = 0; i < dfa.size(); i++)
-	//{
-	//	cout << i << " ";
-	//	for (auto j : noter)
-	//	{
-	//		cout << GOTO[i][j] << " ";
-	//	}
-	//	cout << endl;
-	//}
+	// 以下代码仅用于输出
+
+	/*cout << " ";
+	for (auto i : terminal) cout << i << " ";
+	cout << endl;
+	for (int i = 0; i < dfa.size(); i++)
+	{
+		cout << i << " ";
+		for (auto j : terminal)
+		{
+			cout << action[i][j].first << action[i][j].second << "  ";
+		}
+		cout << endl;
+	}
+	cout << " ";
+	for (auto i : noter) cout << i << " ";
+	cout << endl;
+	for (int i = 0; i < dfa.size(); i++)
+	{
+		cout << i << " ";
+		for (auto j : noter)
+		{
+			cout << GOTO[i][j] << " ";
+		}
+		cout << endl;
+	}*/
 }

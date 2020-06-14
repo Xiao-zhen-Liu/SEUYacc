@@ -17,7 +17,7 @@ typedef std::pair<Item, int> LRitem;
 
 typedef std::unordered_set<LRitem> DFAState;
 
-typedef std::vector<std::unordered_set<LRitem>> DFA;
+typedef std::vector<DFAState> DFA;
 
 typedef std::set<Item> StateCore;
 

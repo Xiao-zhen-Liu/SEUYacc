@@ -103,7 +103,7 @@ void build_pro_num(unordered_set<string> & terminal, unordered_map<string, int>&
 
 	divide = count;
 
-	cout << "divide: --------------  " << divide << endl;
+	//cout << "divide: --------------  " << divide << endl;
 
 	for (auto st : noter)
 	{
@@ -119,10 +119,10 @@ void build_pro_num(unordered_set<string> & terminal, unordered_map<string, int>&
 		Left_num.insert(sn_map[st]);
 	}
 
-	for (auto st : sn_map)
-	{
-		cout << st.first << " -+-" << st.second << endl;
-	}
+	//for (auto st : sn_map)
+	//{
+	//	cout << st.first << " -+-" << st.second << endl;
+	//}
 
 
 
@@ -148,11 +148,11 @@ void build_pro_num(unordered_set<string> & terminal, unordered_map<string, int>&
 		temp.insert(temp.begin(), pro_num[i].first);
 		r_num.insert(make_pair(temp, i));
 
-		cout << "编号: " << i << "  ";
-		cout << ns_map[pro_num[i].first] << "->";
-		for (int j = 0; j < pro_num[i].second.size(); j++)
-			cout << ns_map[pro_num[i].second[j]] << " ";
-		cout << endl;
+		//cout << "编号: " << i << "  ";
+		//cout << ns_map[pro_num[i].first] << "->";
+		//for (int j = 0; j < pro_num[i].second.size(); j++)
+		//	cout << ns_map[pro_num[i].second[j]] << " ";
+		//cout << endl;
 	}
 
 
@@ -576,7 +576,7 @@ void construct_LR1_sets()   //用来生成集簇之间的转换关系
 				dfa.push_back(p.second);     //找到的不是已经存在的项目，那么加入DFA集合中
 			}
 			LRState[make_pair(i, p.first)] = edgeToInt;
-			cout << dfa.size() << endl;
+			/*cout << dfa.size() << endl;*/
 		}
 	}
 

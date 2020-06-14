@@ -30,10 +30,10 @@ void write_parser_code(map<int, map<string, int>>& GOTO, map<int, map<string, pa
 
 	if (_mkdir("yacc_out") == 0)
 	{
-		printf("Directory 'yacc_out' was successfully created\n");
+		printf("\nDirectory 'yacc_out' was successfully created\n");
 	}
 	else
-		printf("Directory 'yacc_out' already exists\n");
+		printf("\nDirectory 'yacc_out' already exists\n");
 
 	out.open("yacc_out/yacc.cpp", ios::out);
 

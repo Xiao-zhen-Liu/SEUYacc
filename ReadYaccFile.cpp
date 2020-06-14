@@ -61,7 +61,7 @@ int read_yacc_file(const string& fileName, string& start, unordered_set<string>&
 
 		if (str == "%start")
 		{
-			cout << "---------------------------------------------------------------" << endl;
+			//cout << "---------------------------------------------------------------" << endl;
 			ambiguity = 2; //如果有%start则自动生成，没有的话则把产生式第一个当做start
 			break;
 		}
@@ -70,7 +70,7 @@ int read_yacc_file(const string& fileName, string& start, unordered_set<string>&
 		if (str == "%left")
 		{
 			ambiguity = 1; //有%left说明本文法是二义性文法，需要读入符号优先级
-			cout << "bi" << endl;
+			//cout << "bi" << endl;
 			break;
 		}
 
@@ -88,8 +88,8 @@ int read_yacc_file(const string& fileName, string& start, unordered_set<string>&
 	if (ambiguity == 1)
 	{
 
-		cout << "fa1" << endl;
-		cout << str << endl;
+		//cout << "fa1" << endl;
+		//cout << str << endl;
 
 		do
 		{
@@ -134,8 +134,8 @@ int read_yacc_file(const string& fileName, string& start, unordered_set<string>&
 	if (ambiguity == 2)
 	{
 
-		cout << "第二种" << endl;
-		cout << str << endl;
+		//cout << "第二种" << endl;
+		//cout << str << endl;
 
 		do
 		{
@@ -211,7 +211,7 @@ int read_yacc_file(const string& fileName, string& start, unordered_set<string>&
 
 			while (str != "|"&&str != ";")
 			{
-				cout << str << endl;
+				//cout << str << endl;
 				p.second.push_back(str);    //右侧的集合
 				in >> str;  //空格后的东西
 
