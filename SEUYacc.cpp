@@ -84,7 +84,7 @@ void write_parser_code(map<int, map<string, int>>& GOTO, map<int, map<string, pa
 
 void construct_LR1_sets();   //用来生成集簇之间的转换关系
 
-void first_operation();
+void get_first_function();
 
 
 int main(int argc, char const* argv[])
@@ -107,7 +107,7 @@ int main(int argc, char const* argv[])
 	get_terminal(pro, noter, terminal);//不是非终结符的字符都是终结符
 	build_pro_num( terminal, sn_map,  ns_map,  terminal_num, divide,noter,  Left,  noter_num,  Left_num, pro, pro_num,r_num,wp_map); // 为了读入的产生式一个编号(读入顺序
 	add_start(start,  startobj, sn_map);
-	first_operation();
+	get_first_function();
 	//cout << "一次" << endl;
 	//for (auto i : First)
 	//{

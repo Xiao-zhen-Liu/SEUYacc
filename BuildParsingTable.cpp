@@ -23,15 +23,15 @@ int find_dot(int& pos, const DFA& dfa, const unordered_set<int>& Left_num)
 }
 
 
-
-int find_pro(int& pos, const DFA& dfa, int a)   //找到集簇中，预测符是a的，要规约的产生式中，最早出现的产生式序号
-{
+//找到集簇中，预测符是a的，要规约的产生式中，最早出现的产生式序号
+int find_pro(int& pos, const DFA& dfa, int a) {
 	int max = -1;
 	for (auto x1 : dfa[pos])    //x是一个OBJ  first是产生式  second是·的位置
 	{
 		auto x = x1.second;
 		auto x2 = x1.first;
-		if (x == a && x2.first.size() == x2.second)  //是需要规约的产生式，并且后面的预测符是边上的
+		//是需要规约的产生式，并且后面的预测符是边上的
+		if (x == a && x2.first.size() == x2.second)  
 		{
 			if (r_num[x1.first.first] > max)
 				max = r_num[x1.first.first];
@@ -55,33 +55,33 @@ void generate_action_goto_map(const DFA& dfa, const unordered_set<string>& termi
 		for (auto j : noter)  GOTO[i][j] = -1;   //i项目号，j为字符号   -1为目标项目编号
 	}
 
-	//for (int i = 0; i < dfa.size(); i++) {
-	//	auto s = dfa[i];
-	//	for (auto lritm : s) {
-	//		// i 为一个LR项目
-	//		if (lritm.first.second == lritm.first.first.size()) {
-	//			cout << "REDUCE" << endl;
-	//			if (ns_map[lritm.first.first[0]] == "start" && ns_map[lritm.second] == "#") {
-	//				action[i][ns_map[lritm.second]] = make_pair("acc", 0);
-	//			}
-	//			else {
-	//				action[i][ns_map[lritm.second]] = make_pair("r", r_num[lritm.first.first]);
-	//				GOTO[i][ns_map[lritm.first.first[0]]] = LRState[{i, lritm.first.first[0]}];
-	//			}
-	//		}
-	//		else {
-	//			int a = lritm.first.first[lritm.first.second];
-	//			int b = lritm.second;
-	//			if (terminal_num.find(a) != terminal_num.end()) {
-	//				// terminal
-	//				if (LRState.find({ i, a }) != LRState.end()) {
-	//					int to = LRState[{i, a}];
-	//					action[i][ns_map[a]] = make_pair("s", to);
-	//				}
-	//			}
-	//		}
-	//	}
-	//}
+		//for (int i = 0; i < dfa.size(); i++) {
+		//	auto s = dfa[i];
+		//	for (auto lritm : s) {
+		//		// i 为一个LR项目
+		//		if (lritm.first.second == lritm.first.first.size()) {
+		//			cout << "REDUCE" << endl;
+		//			if (ns_map[lritm.first.first[0]] == "start" && ns_map[lritm.second] == "#") {
+		//				action[i][ns_map[lritm.second]] = make_pair("acc", 0);
+		//			}
+		//			else {
+		//				action[i][ns_map[lritm.second]] = make_pair("r", r_num[lritm.first.first]);
+		//				GOTO[i][ns_map[lritm.first.first[0]]] = LRState[{i, lritm.first.first[0]}];
+		//			}
+		//		}
+		//		else {
+		//			int a = lritm.first.first[lritm.first.second];
+		//			int b = lritm.second;
+		//			if (terminal_num.find(a) != terminal_num.end()) {
+		//				// terminal
+		//				if (LRState.find({ i, a }) != LRState.end()) {
+		//					int to = LRState[{i, a}];
+		//					action[i][ns_map[a]] = make_pair("s", to);
+		//				}
+		//			}
+		//		}
+		//	}
+		//}
 
 	for (auto i : LRState)  //i的first.first是起点项目编号，first.second是字符号，second是终点编号
 	{

@@ -178,26 +178,23 @@ void build_pro_num(unordered_set<string> & terminal, unordered_map<string, int>&
 
 
 
+void get_single_first(unordered_set<int>& inputSet, const int& symbol, unordered_set<int >& handlingSymbol) {
 
 
-void intersection(unordered_set<int>& leftSet, const unordered_set<int>& rightSet) {
-	leftSet.insert(rightSet.cbegin(), rightSet.cend());
-}
-
-
-
-//两个set为空
-void first_symbol(unordered_set<int>& inputSet, const int& symbol, unordered_set<int >& handlingSymbol) {
 	if (First.find(symbol) != First.end()) {//之前求过了，直接加入，算是优化，不用做后面的事了
-		intersection(inputSet, First[symbol]);
+		inputSet.insert(First[symbol].cbegin(), First[symbol].cend());
 		return;
 	}
 
 	if (symbol == -1) return;                       //如果是-1那不求空集
+
+
 	if (symbol < divide) {//symol是终结符
 		inputSet.insert(symbol);
 		return;
 	}                 //直接加入
+
+
 	else {//symbol是非终结符
 		handlingSymbol.insert(symbol);    //这个已经处理过了
 		for (int i = 0; i < pro_num.size(); i++)
@@ -206,10 +203,13 @@ void first_symbol(unordered_set<int>& inputSet, const int& symbol, unordered_set
 			{            //从第first开始，之后又second个它的产生式
 							   //对于所有symbol在左边的产生式
 				auto producer = pro_num[i];   //是一个产生式
+
 				if (producer.second.size() == 1 && producer.second[0] == -1) {//symbol->epsilon
 					inputSet.insert(-1);   //返回空串
 					continue;
 				}
+
+
 				//遍历产生式右边所有项
 				int j = 1;
 				unordered_set<int> tempSet;
@@ -218,9 +218,9 @@ void first_symbol(unordered_set<int>& inputSet, const int& symbol, unordered_set
 					if (handlingSymbol.find(producer.second[j - 1]) != handlingSymbol.end()) {//防止左递归
 						break;
 					}
-					first_symbol(tempSet, producer.second[j - 1], handlingSymbol);
+					get_single_first(tempSet, producer.second[j - 1], handlingSymbol);
 					if (tempSet.find(-1) == tempSet.end()) {
-						intersection(inputSet, tempSet);
+						inputSet.insert(tempSet.cbegin(), tempSet.cend());
 						break;
 					}
 					if (j == producer.second.size()) {//最后一项还有epsilon
@@ -228,8 +228,8 @@ void first_symbol(unordered_set<int>& inputSet, const int& symbol, unordered_set
 
 						break;
 					}
-					tempSet.erase(-1);
-					intersection(inputSet, tempSet);
+					tempSet.erase(-1);        
+					inputSet.insert(tempSet.cbegin(), tempSet.cend());
 					++j;
 				}
 			}
@@ -238,47 +238,46 @@ void first_symbol(unordered_set<int>& inputSet, const int& symbol, unordered_set
 }
 
 
-void first_operation() {
+
+void get_first_function() {
 	unordered_set<int> firstSet, stackSet;
 
 	for (int symbol : terminal_num) {
 		firstSet.clear();
 		stackSet.clear();
-		first_symbol(firstSet, symbol, stackSet); //求单个first
-		First.emplace(symbol, firstSet);  // symbol和他的first集
+		get_single_first(firstSet, symbol, stackSet); //求单个符号的first集
+		First.emplace(symbol, firstSet);  // 符号和他的first集
 	}
 
 	for (int symbol : noter_num) {
 		firstSet.clear();
 		stackSet.clear();
-		first_symbol(firstSet, symbol, stackSet); //求单个first
-		First.emplace(symbol, firstSet);  // symbol和他的first集
+		get_single_first(firstSet, symbol, stackSet); 
+		First.emplace(symbol, firstSet);  
 	}
-
-
 
 }
 
-void first_string(unordered_set<int>& inputSet, const vector<int>& symbolsVec) {
-
+void get_string_first(unordered_set<int>& inputSet, const vector<int>& symbolsVec) {   
+	//inputSet用来传递结果，symbolsVec是输入的一串字符
 
 	int i = 1;
-	if (symbolsVec.size() == 0) {
-		inputSet.insert(-1);
+	if (symbolsVec.size() == 0) {  //没有字符
+		inputSet.insert(-1);    //返回空串
 		return;
 	}
-	while (i <= symbolsVec.size()) {//不是最后一项，且其中有epsilon
+	while (i <= symbolsVec.size()) {//不是最后一项，且其中有空串
 		auto & tempRef = First[symbolsVec[i - 1]];
-		if (tempRef.find(-1) == tempRef.end()) {
-			intersection(inputSet, tempRef);
+		if (tempRef.find(-1) == tempRef.end()) {   //清除空串后加入
+			inputSet.insert(tempRef.cbegin(), tempRef.cend());
 			break;
 		}
-		if (i == symbolsVec.size()) {//最后一项还有epsilon
-			inputSet.insert(-1);
+		if (i == symbolsVec.size()) {//所有项都有空串
+			inputSet.insert(-1); //加入空串
 			break;
 		}
 		tempRef.erase(-1);
-		intersection(inputSet, tempRef);
+		inputSet.insert(tempRef.cbegin(), tempRef.cend());
 		++i;
 	}
 }
@@ -340,7 +339,7 @@ unordered_set<LRitem> inter_extend(unordered_set <LRitem> & x,int &divide,
 
 				temp_first.clear();
 
-				first_string(temp_first, xx);
+				get_string_first(temp_first, xx);
 				
 				if (temp_first.find(-1) != temp_first.end()) {//有epsilon
 					temp_first.erase(-1);
@@ -418,13 +417,12 @@ unordered_set<LRitem> inter_extend(unordered_set <LRitem> & x,int &divide,
 
 
 
-void outer_extend(int & pos, map<int, unordered_set<LRitem> >& newStateMap)
-//尝试每一个项目集合每一个文法符号，看是否可能得到一个新项目
-//如果可以就加入到集簇中   pos是项目编号， xx为所要尝试的在后面添加的终结符/非终结符
+void outer_extend(int & pos, map<int, unordered_set<LRitem> >& newStateMap) //旧符号状态
+
 {
 	unordered_set<LRitem> ans;
 	LRitem newItem;
-	int edge;
+	int edge;  
 	for (const auto &state1 : dfa[pos])    //x是一个OBJ  first是产生式  second是·的位置
 	{
 		auto LRitem1 = state1.first;
@@ -489,12 +487,12 @@ void construct_LR1_sets()   //用来生成集簇之间的转换关系
 
 
 	queue<int> unhandledStates;    //有一个没处理的状态
-	unhandledStates.push(0);
+	unhandledStates.push(0);   //将初始状态加入队列中
 
 	dfa.push_back(statu);  // 存入DFA中，得到一个编号为0，因为位置为0号
 
 	//cout << "状态号------------: " << dfa.size() << endl;
-	map<int, unordered_set<LRitem> > newStateMap;
+	map<int, unordered_set<LRitem> > newStateMap; //之后外扩展将要出现的新状态
 
 	int stateNumCounter = 1;
 
@@ -510,7 +508,7 @@ void construct_LR1_sets()   //用来生成集簇之间的转换关系
 		if (dfa.size() > 200) system("pause");
 		*/
 
-		outer_extend(i, newStateMap);
+		outer_extend(i, newStateMap);  //对第i个状态，进行外部扩展，将新状态进行Map中
 		//after_set.clear();
 		//for (auto state1 : DFA[i])    //x是一个OBJ  first是产生式  second是·的位置
 		//{
@@ -520,14 +518,16 @@ void construct_LR1_sets()   //用来生成集簇之间的转换关系
 			//after_set.insert(LRitem1.first[LRitem1.second]);
 		//for (auto t : after_set)
 
-		for (auto & p : newStateMap) {
+		for (auto & p : newStateMap) { //遍历新状态
 
 			p.second=inter_extend(p.second, divide, wp_map, pro_num, sn_map, First, ns_map);
-			int edgeToInt = -1;
-			// 检查是否存在相同的状态
-			for (const auto & s : dfa) {
-				if (s == p.second ) {
-					edgeToInt = find(dfa.begin(), dfa.end(), s) - dfa.begin(); //find返回在数组中的位置，减去起始位置得到编号  s.numberInt;
+			//新状态内部扩展
+			int edgeToInt = -1;//表示目标状态
+		
+			for (const auto & s : dfa) { //s是当前已经在dfa中的状态
+				if (s == p.second ) {	// 检查是否存在相同的状态
+					edgeToInt = find(dfa.begin(), dfa.end(), s) - dfa.begin(); 
+					//find返回在数组中的位置，减去起始位置得到编号  s.numberInt;
 					
 					/*
 					for (auto state1 : s)   //j为一个obj
@@ -566,16 +566,16 @@ void construct_LR1_sets()   //用来生成集簇之间的转换关系
 
 				}
 			}
-			if (edgeToInt == -1)//不存在要新建状态了
+			if (edgeToInt == -1)//没有找到与新状态相同的旧状态，那么将新状态加入dfa中
 			{
 
-				edgeToInt = stateNumCounter;
-				unhandledStates.push(stateNumCounter);
+				edgeToInt = stateNumCounter;   //目标状态为一个新状态序号
+				unhandledStates.push(stateNumCounter);   //将没有进行外部扩展的新状态加入队列
 				//cout << "我也是状态数" << edgeToInt << endl;
 				stateNumCounter++;
 				dfa.push_back(p.second);     //找到的不是已经存在的项目，那么加入DFA集合中
 			}
-			LRState[make_pair(i, p.first)] = edgeToInt;
+			LRState[make_pair(i, p.first)] = edgeToInt; //i为起始状态序号，p.first为边上的符号， edgetoint为新状态序号
 			/*cout << dfa.size() << endl;*/
 		}
 	}
